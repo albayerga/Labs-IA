@@ -82,28 +82,35 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
     """
+
     print("Start:", problem.getStartState())
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
-    "util.raiseNotDefined()"
-
     start = problem.getStartState()
-    stack = util.Stack()
-    visited = []
+    stack = util.Stack() #frontier
+    visited = [] #explored
 
     stack.push((start, [])) #in stack we push the first node and its path ([] rn)
 
     while not stack.isEmpty(): #while there are nodes in the stack
+        
         node, path = stack.pop() #we pop the node and its path
-        if problem.isGoalState(node): #if the node is the goal state we return the path
-            return path
-        if node not in visited: #if the node is not in visited we add it to visited
-            visited.append(node)
-            for successor in problem.getSuccessors(node): #we push the successors of the node one by one and check them, we also update the path
-                stack.push((successor[0], path + [successor[1]]))
-    return []
+        
+        if node not in visited: #if the node is not explored yet
+            visited.append(node) #we add it to the explored list
 
+            if problem.isGoalState(node): #if the node is the goal state we return the path
+                return path        
+        
+            else:
+                successors = problem.getSuccessors(node) #we get the successors of the node
+                for successor in successors: #for each successor
+                    new_node = successor[0] 
+                    new_path = path + [successor[1]] 
+                    stack.push((new_node, new_path)) #we push the successor and its path to the stack
+    
+    return path
 
 
 def breadthFirstSearch(problem):
