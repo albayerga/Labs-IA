@@ -115,8 +115,40 @@ def depthFirstSearch(problem):
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
+
+    start = problem.getStartState()
+    queue = util.Queue() #frontier
+    visited = [] #explored
+
+    queue.push((start, [])) #in queue we push the first node and its path ([] rn)
+
+    while not queue.isEmpty(): #while there are nodes in the queue
+        node, path = queue.pop()
+
+        if node not in visited: #if the node is not explored yet
+            visited.append(node)
+
+            if problem.isGoalState(node): #if the node is the goal state we return the path
+                return path
+            
+            else:
+                successors = problem.getSuccessors(node)
+                for successor in successors:
+                    new_node = successor[0]
+                    new_path = path + [successor[1]]
+                    queue.push((new_node, new_path))
+    
+    return path
+
+        
+
+
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
