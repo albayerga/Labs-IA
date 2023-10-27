@@ -82,87 +82,79 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
     """
-
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     start = problem.getStartState()
-    stack = util.Stack() #frontier
-    visited = [] #explored
+    stack = util.Stack()
+    visited = []
+    stack.push((start,[]))
 
-    stack.push((start, [])) #in stack we push the first node and its path ([] rn)
+    while not stack.isEmpty():
+        
+        node, path = stack.pop()
 
-    while not stack.isEmpty(): #while there are nodes in the stack
-        
-        node, path = stack.pop() #we pop the node and its path
-        
-        if node not in visited: #if the node is not explored yet
-            visited.append(node) #we add it to the explored list
+        if not node in visited:
+            visited.append(node)
 
-            if problem.isGoalState(node): #if the node is the goal state we return the path
-                return path        
-        
-            else:
-                successors = problem.getSuccessors(node) #we get the successors of the node
-                for successor in successors: #for each successor
-                    new_node = successor[0] 
-                    new_path = path + [successor[1]] 
-                    stack.push((new_node, new_path)) #we push the successor and its path to the stack
-    
-    return path
+            if problem.isGoalState(node):
+                return path
+            
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor
+                newPath = path + [newAction]
+                stack.push((newNode, newPath))
+    return []
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     start = problem.getStartState()
-    queue = util.Queue() #frontier
-    visited = [] #explored
+    queue = util.Queue()
+    visited = []
+    queue.push((start,[]))
 
-    queue.push((start, [])) #in queue we push the first node and its path ([] rn)
-
-    while not queue.isEmpty(): #while there are nodes in the queue
+    while not queue.isEmpty():
+        
         node, path = queue.pop()
 
-        if node not in visited: #if the node is not explored yet
+        if not node in visited:
             visited.append(node)
 
-            if problem.isGoalState(node): #if the node is the goal state we return the path
+            if problem.isGoalState(node):
                 return path
             
-            else:
-                successors = problem.getSuccessors(node)
-                for successor in successors:
-                    new_node = successor[0]
-                    new_path = path + [successor[1]]
-                    queue.push((new_node, new_path))
-    
-    return path
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor
+                newPath = path + [newAction]
+                queue.push((newNode, newPath))
+    return []
 
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     start = problem.getStartState()
     pqueue = util.PriorityQueue() #frontier
-    visited = {} #explored
+    visited = [] #explored
     
     init_node = (start, [], 0) #(state, action, cost)
-    
-    pqueue.push(init_node, 0) #in pqueue we push the first node and the cost
+    pqueue.push(init_node, problem) #in pqueue we push the first node and the cost
     
     while not pqueue.isEmpty():
-        node, path, cost = pqueue.pop()
+        node, path = pqueue.pop()
        
         if (node not in visited) or (cost < visited[node]):
             visited[node] = cost
@@ -179,7 +171,7 @@ def uniformCostSearch(problem):
                     new_node = (succ_node, new_path, new_cost)
                     pqueue.update(new_node, new_cost)
 
-    return path
+    return []
 
 
 def nullHeuristic(state, problem=None):
@@ -193,6 +185,23 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
     start = problem.getStartState()
+    queue = util.PriorityQueue()
+    done = []
+    queue.push((start,[]), problem)
+
+    while not queue.isEmpty():
+        node, path = queue.pop()
+        #print(path)
+        if not node in done:
+            done.append(node)
+            if problem.isGoalState(node):
+                return path
+            for succ in problem.getSuccessors(node):
+                nextState, dir, cost = succ
+                actions = path + [dir]
+                priority = problem.getCostOfActions(actions) + heuristic(nextState, problem) 
+                queue.push((nextState, actions), priority)
+    return []
 
 
 # Abbreviations
