@@ -145,15 +145,42 @@ def breadthFirstSearch(problem):
     
     return path
 
-        
-
-
-
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    print("Start:", problem.getStartState())
+    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
+    start = problem.getStartState()
+    pqueue = util.PriorityQueue() #frontier
+    visited = {} #explored
+    
+    init_node = (start, [], 0) #(state, action, cost)
+    
+    pqueue.push(init_node, 0) #in pqueue we push the first node and the cost
+    
+    while not pqueue.isEmpty():
+        node, path, cost = pqueue.pop()
+       
+        if (node not in visited) or (cost < visited[node]):
+            visited[node] = cost
+
+            if problem.isGoalState(node):
+                return path
+            
+            else:
+                successors = problem.getSuccessors(node)
+                
+                for succ_node, succ_path, succ_cost in successors:
+                    new_path = path + [succ_path]
+                    new_cost = cost + succ_cost
+                    new_node = (succ_node, new_path, new_cost)
+                    pqueue.update(new_node, new_cost)
+
+    return path
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -165,7 +192,7 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState()
 
 
 # Abbreviations
