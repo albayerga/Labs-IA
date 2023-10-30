@@ -510,25 +510,29 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    #return 0 # Default to trivial solution
+
     food_positions = foodGrid.asList() #we get the list of food positions
-    heuristic_value = 0 #init heuristic value
+    heuristic = 0 #init heuristic value
 
     if not food_positions:
         return 0 #if there is no food, the heuristic value is 0
 
-    #calculate manhattan distances from the current position to all the food positions
-    distances = []
+    #calculate manhattan distances from the current position to all the food positions - find the closest food
+    #while len(food_positions) > 0: #while there are food positions
+    min_dist = float('inf')
+    closest_food = None
     for food in food_positions:
         distance = util.manhattanDistance(position, food)
-        distances.append(distance)
+        if distance < min_dist:
+            min_dist = distance
+            closest_food = food
     
-    #find closest food position
-    closest_food = min(distances)
-    heuristic_value += closest_food #add the closest food distance to the heuristic value
+    heuristic += min_dist #add the closest food distance to the heuristic value
+    #position = closest_food #update the current position
+    #food_positions.remove(closest_food) #remove the closest food from the list of food positions
 
-    return heuristic_value #return the heuristic value
+    return heuristic
 
     
 
