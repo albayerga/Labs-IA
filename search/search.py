@@ -185,7 +185,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     start = problem.getStartState()
     pqueue = util.PriorityQueue() #frontier
     visited = [] #explored
-    pqueue.push((start,[]), problem)
+    pqueue.push((start,[]), heuristic(start, problem)) #we push the first node, its path to it ([] rn) and the iniital heuristic
 
     while not pqueue.isEmpty(): #same as UCS but with a priority queue that takes into account the heuristic
         node, path = pqueue.pop()

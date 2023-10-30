@@ -388,29 +388,35 @@ def cornersHeuristic(state, problem):
     """
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
-
-    visited = state[1] #visited corners
-    unvisited = [] #unvisited corners 
+     
     node = state[0] #current position
-    cost = 0 #init heuristic cost
+    cornersState = state[1]
+    unvisited = [] #unvisited corners
+    heuristic = 0
 
     #we add the unvisited corners to the unvisited list
-    for corner in corners:
-        if corner not in visited:
-            unvisited.append(corner)
+    for i in range(len(cornersState)):
+        if cornersState[i] == False: 
+            unvisited.append(corners[i])
 
-    while unvisited: #while there are unvisited corners
+    #calculate the distance from current node to all corner nodes
+    while len(unvisited) > 0: #while there are unvisited corners
 
-        dist, coord = min([(util.manhattanDistance(node, corner), corner) for corner in unvisited]) #find the minimum distance to an unvisited corner
+        #find closest corner
+        min_dist = float('inf')
+        closest_corner = None
 
-        cost += dist #add the minimum distance to the cost
+        for corner in unvisited:
+            distance = util.manhattanDistance(node, corner)
+            if distance < min_dist:
+                min_dist = distance
+                closest_corner = corner
 
-        node = coord #the new node is the corner with the minimum distance
-
-        unvisited.remove(coord) #remove the corner from the unvisited list
-
-    return cost #calculated heuristic value
-
+        heuristic += min_dist #add the closest corner distance to the heuristic value
+        node = closest_corner #update the current node
+        unvisited.remove(closest_corner) #remove the closest corner from the unvisited list
+    
+    return heuristic
 
 
 class AStarCornersAgent(SearchAgent):
@@ -506,6 +512,25 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     return 0
+    food_positions = foodGrid.asList() #we get the list of food positions
+    heuristic_value = 0 #init heuristic value
+
+    if not food_positions:
+        return 0 #if there is no food, the heuristic value is 0
+
+    #calculate manhattan distances from the current position to all the food positions
+    distances = []
+    for food in food_positions:
+        distance = util.manhattanDistance(position, food)
+        distances.append(distance)
+    
+    #find closest food position
+    closest_food = min(distances)
+    heuristic_value += closest_food #add the closest food distance to the heuristic value
+
+    return heuristic_value #return the heuristic value
+
+    
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
