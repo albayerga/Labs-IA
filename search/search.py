@@ -87,26 +87,27 @@ def depthFirstSearch(problem):
     #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     start = problem.getStartState()
-    stack = util.Stack()
-    visited = []
-    stack.push((start,[]))
+    stack = util.Stack() #frontier
+    visited = [] #explored
+    stack.push((start,[])) #in stack we push the first node and its path to it ([] rn)
 
-    while not stack.isEmpty():
+    while not stack.isEmpty(): #while there are nodes in the frontier
         
-        node, path = stack.pop()
+        node, path = stack.pop() #we pop the node and its path to it
 
-        if not node in visited:
-            visited.append(node)
+        if not node in visited: #if the node is not visited yet
+            visited.append(node) #we add it to the visited list
 
-            if problem.isGoalState(node):
-                return path
+            if problem.isGoalState(node): #if the node is the goal state
+                return path #we return the path to it
             
-            successors = problem.getSuccessors(node)
-            for successor in successors:
-                newNode, newAction, cost = successor
-                newPath = path + [newAction]
-                stack.push((newNode, newPath))
-    return []
+            successors = problem.getSuccessors(node) #we get the successors of the node
+            for successor in successors: #for each successor
+                newNode, newAction, cost = successor #we get the node, the action that leads to it and the cost (we don't need the cost but the autograder does)
+                newPath = path + [newAction] #we add the action to the path and get the new path
+                stack.push((newNode, newPath)) #we push the new node and its path to it to the stack
+    
+    return [] #if we don't find a path we return an empty list
 
 
 def breadthFirstSearch(problem):
@@ -117,11 +118,11 @@ def breadthFirstSearch(problem):
     #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     start = problem.getStartState()
-    queue = util.Queue()
-    visited = []
+    queue = util.Queue() #frontier
+    visited = [] #explored
     queue.push((start,[]))
 
-    while not queue.isEmpty():
+    while not queue.isEmpty(): #same as DFS but with a queue (FIFO) instead of a stack (LIFO)
         
         node, path = queue.pop()
 
@@ -133,9 +134,10 @@ def breadthFirstSearch(problem):
             
             successors = problem.getSuccessors(node)
             for successor in successors:
-                newNode, newAction, cost = successor
+                newNode, newAction, cost = successor #again, we don't need the cost but the autograder does
                 newPath = path + [newAction]
                 queue.push((newNode, newPath))
+    
     return []
 
 
@@ -150,26 +152,23 @@ def uniformCostSearch(problem):
     pqueue = util.PriorityQueue() #frontier
     visited = [] #explored
     
-    init_node = (start, [], 0) #(state, action, cost)
-    pqueue.push(init_node, problem) #in pqueue we push the first node and the cost
-    
-    while not pqueue.isEmpty():
-        node, path = pqueue.pop()
+    pqueue.push((start,[]), 0) #we push the first node, its path to it ([] rn) and the cost (0 rn)
+
+    while not pqueue.isEmpty(): #same as BFS but with a priority queue instead of a queue
+        node, path = pqueue.pop() #now we pop the node (and its path to it) with the lowest cost 
        
-        if (node not in visited) or (cost < visited[node]):
-            visited[node] = cost
+        if not node in visited:
+            visited.append(node)
 
             if problem.isGoalState(node):
                 return path
             
-            else:
-                successors = problem.getSuccessors(node)
-                
-                for succ_node, succ_path, succ_cost in successors:
-                    new_path = path + [succ_path]
-                    new_cost = cost + succ_cost
-                    new_node = (succ_node, new_path, new_cost)
-                    pqueue.update(new_node, new_cost)
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor
+                newPath = path + [newAction]
+                priority = problem.getCostOfActions(newPath)
+                pqueue.push((newNode, newPath), priority) 
 
     return []
 
