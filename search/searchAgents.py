@@ -287,8 +287,20 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-        "*** YOUR CODE HERE ***"
-        self.state = (self.startingPosition, (False, False, False, False))
+        
+        cornersStatus = [False, False, False, False] #initially all the corners are not visited
+        
+        #if the starting position is a corner, we change the value of that corner status to True
+        if self.startingPosition == self.corners[0]:
+            cornersStatus[0] = True
+        elif self.startingPosition == self.corners[1]:
+            cornersStatus[1] = True
+        elif self.startingPosition == self.corners[2]:
+            cornersStatus[2] = True
+        elif self.startingPosition == self.corners[3]:
+            cornersStatus[3] = True
+        
+        self.startState= (self.startingPosition, tuple(cornersStatus)) #state is a tuple of the starting position and the cornersStatus tuple
         
 
     def getStartState(self):
@@ -296,17 +308,15 @@ class CornersProblem(search.SearchProblem):
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
-        "*** YOUR CODE HERE ***"
-        return self.state
+        return self.startState
 
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        "*** YOUR CODE HERE ***"
         #goal state means that all corners are visited
-        if state[1] == (True, True, True, True):
+        if state[1] == (True, True, True, True): #so if all the values in the cornersStatus are True, then is a goal state
             return True
         else:
             return False
@@ -327,12 +337,7 @@ class CornersProblem(search.SearchProblem):
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             # Add a successor state to the successor list if the action is legal
             # Here's a code snippet for figuring out whether a new position hits a wall:
-            #   x,y = currentPosition
-            #   dx, dy = Actions.directionToVector(action)
-            #   nextx, nexty = int(x + dx), int(y + dy)
-            #   hitsWall = self.walls[nextx][nexty]
 
-            "*** YOUR CODE HERE ***"
             currentPosition = state[0]
             cornersStatus = state[1]
             x, y = currentPosition
@@ -340,13 +345,16 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty] #check if the next position is a wall
 
-            if not hitsWall:
-                newCornersStatus = list(cornersStatus)
-                if (nextx, nexty) in self.corners:
-                    index = self.corners.index((nextx, nexty))
+            if not hitsWall: #if the next position is not a wall
+                newCornersStatus = list(cornersStatus) #we create a new list of cornersStatus (so we can change the values)
+                newPosition = (nextx, nexty)
+
+                if (newPosition) in self.corners: #if the new position is a corner, we change the value of that corner status to True
+                    index = self.corners.index(newPosition)
                     newCornersStatus[index] = True
-                newCornersStatus = tuple(newCornersStatus)
-                successors.append((((nextx, nexty), newCornersStatus), action, 1))
+
+                newCornersStatus = tuple(newCornersStatus) #we convert the list to a tuple again
+                successors.append(((newPosition, newCornersStatus), action, 1)) #and we add the new successor to the list of successors (with cost 1)
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
