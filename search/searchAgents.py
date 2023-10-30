@@ -389,8 +389,29 @@ def cornersHeuristic(state, problem):
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    visited = state[1] #visited corners
+    unvisited = [] #unvisited corners 
+    node = state[0] #current position
+    cost = 0 #init heuristic cost
+
+    #we add the unvisited corners to the unvisited list
+    for corner in corners:
+        if corner not in visited:
+            unvisited.append(corner)
+
+    while unvisited: #while there are unvisited corners
+
+        dist, coord = min([(util.manhattanDistance(node, corner), corner) for corner in unvisited]) #find the minimum distance to an unvisited corner
+
+        cost += dist #add the minimum distance to the cost
+
+        node = coord #the new node is the corner with the minimum distance
+
+        unvisited.remove(coord) #remove the corner from the unvisited list
+
+    return cost #calculated heuristic value
+
+
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
@@ -514,8 +535,8 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.astar(problem)  #Ejecutamos la busqueda A star para el problema procedente de la función complementaria "AnyFoodSearchProblem"
+        
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -549,9 +570,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         complete the problem definition.
         """
         x,y = state
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return (x, y) in self.food.asList() #En este caso el goal state sucederá cuando Pacman se encuentre encima de algun punto de comida
 
 def mazeDistance(point1, point2, gameState):
     """
