@@ -92,7 +92,6 @@ def depthFirstSearch(problem):
     stack.push((start,[])) #in stack we push the first node and its path to it ([] rn)
 
     while not stack.isEmpty(): #while there are nodes in the frontier
-        
         node, path = stack.pop() #we pop the node and its path to it
 
         if not node in visited: #if the node is not visited yet
@@ -123,7 +122,6 @@ def breadthFirstSearch(problem):
     queue.push((start,[]))
 
     while not queue.isEmpty(): #same as DFS but with a queue (FIFO) instead of a stack (LIFO)
-        
         node, path = queue.pop()
 
         if not node in visited:
@@ -180,26 +178,31 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
+    
     start = problem.getStartState()
-    queue = util.PriorityQueue()
-    done = []
-    queue.push((start,[]), problem)
+    pqueue = util.PriorityQueue() #frontier
+    visited = [] #explored
+    pqueue.push((start,[]), problem)
 
-    while not queue.isEmpty():
-        node, path = queue.pop()
-        #print(path)
-        if not node in done:
-            done.append(node)
+    while not pqueue.isEmpty(): #same as UCS but with a priority queue that takes into account the heuristic
+        node, path = pqueue.pop()
+        
+        if not node in visited:
+            visited.append(node)
+
             if problem.isGoalState(node):
                 return path
-            for succ in problem.getSuccessors(node):
-                nextState, dir, cost = succ
-                actions = path + [dir]
-                priority = problem.getCostOfActions(actions) + heuristic(nextState, problem) 
-                queue.push((nextState, actions), priority)
+            
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor
+                newPath = path + [newAction]
+                priority = problem.getCostOfActions(newPath) + heuristic(newNode, problem) #here we add the heuristic to the cost
+                pqueue.push((newNode, newPath), priority)
+
     return []
 
 
