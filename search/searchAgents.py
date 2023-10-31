@@ -291,14 +291,9 @@ class CornersProblem(search.SearchProblem):
         cornersStatus = [False, False, False, False] #initially all the corners are not visited
         
         #if the starting position is a corner, we change the value of that corner status to True
-        if self.startingPosition == self.corners[0]:
-            cornersStatus[0] = True
-        elif self.startingPosition == self.corners[1]:
-            cornersStatus[1] = True
-        elif self.startingPosition == self.corners[2]:
-            cornersStatus[2] = True
-        elif self.startingPosition == self.corners[3]:
-            cornersStatus[3] = True
+        for i in range(len(self.corners)):
+            if self.startingPosition == self.corners[i]:
+                cornersStatus[i] = True
         
         self.startState= (self.startingPosition, tuple(cornersStatus)) #state is a tuple of the starting position and the cornersStatus tuple
         
@@ -390,16 +385,16 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
      
     node = state[0] #current position
-    cornersState = state[1]
+    cornersStatus = state[1]
     unvisited = [] #unvisited corners
     heuristic = 0
 
     #we add the unvisited corners to the unvisited list
-    for i in range(len(cornersState)):
-        if cornersState[i] == False: 
+    for i in range(len(cornersStatus)):
+        if cornersStatus[i] == False: #if the corner is not visited
             unvisited.append(corners[i])
 
-    #calculate the distance from current node to all corner nodes
+    #calculate the distance from current node to all unvisited corners
     while len(unvisited) > 0: #while there are unvisited corners
 
         #find closest corner
@@ -510,32 +505,29 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    #return 0 # Default to trivial solution
-
     food_positions = foodGrid.asList() #we get the list of food positions
-    heuristic = 0 #init heuristic value
 
-    if not food_positions:
-        return 0 #if there is no food, the heuristic value is 0
-
-    #calculate manhattan distances from the current position to all the food positions - find the closest food
-    #while len(food_positions) > 0: #while there are food positions
-    min_dist = float('inf')
-    closest_food = None
-    for food in food_positions:
-        distance = util.manhattanDistance(position, food)
-        if distance < min_dist:
-            min_dist = distance
-            closest_food = food
-    
-    heuristic += min_dist #add the closest food distance to the heuristic value
-    #position = closest_food #update the current position
-    #food_positions.remove(closest_food) #remove the closest food from the list of food positions
-
-    return heuristic
-
+    if 'heuristic' in problem.heuristicInfo: #if the heuristic value is already stored in the problem.heuristicInfo dictionary
+        heuristic = problem.heuristicInfo['heuristic'] #we get the heuristic value from the dictionary
+    else:
+        heuristic = 0 #else, we init the heuristic value to 0
     
 
+    if food_positions: #if there are still food positions to eat
+        min_dist = float('inf') #we init the min_dist value to infinity
+        
+        for food in food_positions: #for each food position
+            distance = util.manhattanDistance(position, food) #we calculate the distance from the current position to the food position
+            
+            if distance < min_dist: #get the min distance
+                min_dist = distance
+        
+        heuristic = min_dist
+        problem.heuristicInfo['heuristic'] = heuristic #we store the heuristic value in the problem.heuristicInfo dictionary
+
+    return heuristic #we return the heuristic value
+
+    
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
