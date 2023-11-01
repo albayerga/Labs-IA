@@ -82,43 +82,94 @@ def depthFirstSearch(problem):
     To get started, you might want to try some of these simple commands to
     understand the search problem that is being passed in:
     """
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-
-    "*** YOUR CODE HERE ***"
-    "util.raiseNotDefined()"
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
     start = problem.getStartState()
-    stack = util.Stack()
-    visited = []
+    stack = util.Stack() #frontier
+    visited = [] #explored
+    stack.push((start,[])) #in stack we push the first node and its path to it ([] rn)
 
-    if(problem.isGoalState(start)):
-        return []
+    while not stack.isEmpty(): #while there are nodes in the frontier
+        node, path = stack.pop() #we pop the node and its path to it
 
-    stack.push((start, []))
-    while not stack.isEmpty():
-        node, path = stack.pop()
-        # print("pop", node, path)
-        if problem.isGoalState(node):
-            return path
-        if node not in visited:
-            visited.append(node)
-            for successor in problem.getSuccessors(node):
-                stack.push((successor[0], path + [successor[1]]))
-    return []
+        if not node in visited: #if the node is not visited yet
+            visited.append(node) #we add it to the visited list
 
+            if problem.isGoalState(node): #if the node is the goal state
+                return path #we return the path to it
+            
+            successors = problem.getSuccessors(node) #we get the successors of the node
+            for successor in successors: #for each successor
+                newNode, newAction, cost = successor #we get the node, the action that leads to it and the cost (we don't need the cost but the autograder does)
+                newPath = path + [newAction] #we add the action to the path and get the new path
+                stack.push((newNode, newPath)) #we push the new node and its path to it to the stack
+    
+    return [] #if we don't find a path we return an empty list
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
+    start = problem.getStartState()
+    queue = util.Queue() #frontier
+    visited = [] #explored
+    queue.push((start,[]))
+
+    while not queue.isEmpty(): #same as DFS but with a queue (FIFO) instead of a stack (LIFO)
+        node, path = queue.pop()
+
+        if not node in visited:
+            visited.append(node)
+
+            if problem.isGoalState(node):
+                return path
+            
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor #again, we don't need the cost but the autograder does
+                newPath = path + [newAction]
+                queue.push((newNode, newPath))
+    
+    return []
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    #print("Start:", problem.getStartState())
+    #print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+    #print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+
+    start = problem.getStartState()
+    pqueue = util.PriorityQueue() #frontier
+    visited = [] #explored
+    
+    pqueue.push((start,[]), 0) #we push the first node, its path to it ([] rn) and the cost (0 rn)
+
+    while not pqueue.isEmpty(): #same as BFS but with a priority queue instead of a queue
+        node, path = pqueue.pop() #now we pop the node (and its path to it) with the lowest cost 
+       
+        if not node in visited:
+            visited.append(node)
+
+            if problem.isGoalState(node):
+                return path
+            
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor
+                newPath = path + [newAction]
+                priority = problem.getCostOfActions(newPath)
+                pqueue.push((newNode, newPath), priority) 
+
+    return []
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -127,10 +178,32 @@ def nullHeuristic(state, problem=None):
     """
     return 0
 
+
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    start = problem.getStartState()
+    pqueue = util.PriorityQueue() #frontier
+    visited = [] #explored
+    pqueue.push((start,[]), heuristic(start, problem)) #we push the first node, its path to it ([] rn) and the iniital heuristic
+
+    while not pqueue.isEmpty(): #same as UCS but with a priority queue that takes into account the heuristic
+        node, path = pqueue.pop()
+        
+        if not node in visited:
+            visited.append(node)
+
+            if problem.isGoalState(node):
+                return path
+            
+            successors = problem.getSuccessors(node)
+            for successor in successors:
+                newNode, newAction, cost = successor
+                newPath = path + [newAction]
+                priority = problem.getCostOfActions(newPath) + heuristic(newNode, problem) #here we add the heuristic to the cost
+                pqueue.push((newNode, newPath), priority)
+
+    return []
 
 
 # Abbreviations
