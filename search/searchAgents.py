@@ -507,25 +507,18 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     food_positions = foodGrid.asList() #we get the list of food positions
 
-    if 'heuristic' in problem.heuristicInfo: #if the heuristic value is already stored in the problem.heuristicInfo dictionary
-        heuristic = problem.heuristicInfo['heuristic'] #we get the heuristic value from the dictionary
-    else:
-        heuristic = 0 #else, we init the heuristic value to 0
-    
+    if not food_positions: #if there is no food, we return 0
+        return 0 
 
-    if food_positions: #if there are still food positions to eat
-        min_dist = float('inf') #we init the min_dist value to infinity
-        
-        for food in food_positions: #for each food position
-            distance = util.manhattanDistance(position, food) #we calculate the distance from the current position to the food position
-            
-            if distance < min_dist: #get the min distance
-                min_dist = distance
-        
-        heuristic = min_dist
-        problem.heuristicInfo['heuristic'] = heuristic #we store the heuristic value in the problem.heuristicInfo dictionary
+    #we calculate the distance from current position to all food positions
+    #and we return the maximum distance
+    max_distance = 0
+    for food in food_positions:
+        distance = util.manhattanDistance(position, food)
+        if distance > max_distance:
+            max_distance = distance
 
-    return heuristic #we return the heuristic value
+    return max_distance
 
     
 class ClosestDotSearchAgent(SearchAgent):
