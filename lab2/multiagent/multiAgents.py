@@ -74,7 +74,29 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        newFood = currentGameState.getFood().asList() # list of food
+        closestFood = float("inf") 
+        closestGhost= float("inf")
+
+        #get the closest food
+        for food in newFood:
+            closestFood = min(closestFood, manhattanDistance(newPos, food))
+
+        #get the closest ghost
+        for ghost in successorGameState.getGhostPositions():
+            closestGhost = min(closestGhost, manhattanDistance(newPos, ghost))
+        
+        #if the ghost is too close, return -inf
+        if closestGhost < 2:
+            return float("-inf")
+
+        #if there is no food left, return inf
+        if closestFood == 0:
+            return float("inf")
+
+        #return the reciprocal of the closest food and the closest ghost  
+        return closestGhost / closestFood
+
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -135,7 +157,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return self.minimax(gameState, 0, 0)[0]
+
+        #continuará
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
